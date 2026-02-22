@@ -38,11 +38,14 @@
             width: 160px;
             height: auto;
         }
-        video {
+        .video-container {
             width: 100%;
             height: 100%;
-            object-fit: contain;
-            background: black;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
     </style>
 </head>
@@ -50,15 +53,49 @@
     <a href="index.html" class="home-link" id="homeLink">
         <img src="home.png" alt="На главную">
     </a>
-    <video id="videoPlayer" src="vigilanteshootdown.mp4" controls loop></video>
+    <div class="video-container">
+        <iframe id="youtubePlayer" 
+            src="https://www.youtube.com/embed/XGxIE1hr0w4?enablejsapi=1&autoplay=0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allowfullscreen>
+        </iframe>
+    </div>
 
     <script>
-        const video = document.getElementById('videoPlayer');
-        const homeLink = document.getElementById('homeLink');
+        // Загружаем YouTube IFrame API
+        let player;
         let hideTimeout = null;
         let mouseActive = false;
+        let isPlaying = false;
+        const homeLink = document.getElementById('homeLink');
 
-        // Показываем лого (отменяем скрытие)
+        // Функция, вызываемая API YouTube, когда готов
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtubePlayer', {
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        // Обработка изменения состояния плеера
+        function onPlayerStateChange(event) {
+            // -1 (не стартовало), 0 (закончилось), 1 (играет), 2 (пауза), 3 (буферизация)
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                showLogo();
+                scheduleHideIfPlaying();
+            } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED || event.data === -1) {
+                isPlaying = false;
+                showLogo();
+                if (hideTimeout) {
+                    clearTimeout(hideTimeout);
+                    hideTimeout = null;
+                }
+            }
+        }
+
+        // Показываем лого
         function showLogo() {
             if (hideTimeout) {
                 clearTimeout(hideTimeout);
@@ -72,22 +109,22 @@
             homeLink.classList.add('hidden');
         }
 
-        // Планируем скрытие через 3 секунды, если видео играет
+        // Планируем скрытие через 3 секунды, если видео играет и мышь не активна
         function scheduleHideIfPlaying() {
-            if (!video.paused && !mouseActive) {
+            if (isPlaying && !mouseActive) {
                 if (hideTimeout) clearTimeout(hideTimeout);
                 hideTimeout = setTimeout(hideLogo, 3000);
             }
         }
 
-        // При любом движении мыши показываем лого и, если видео играет, планируем скрытие
+        // При любом движении мыши
         function onMouseMove() {
             mouseActive = true;
             showLogo();
-            if (!video.paused) {
+            if (isPlaying) {
                 scheduleHideIfPlaying();
             }
-            // Сбрасываем флаг через небольшой интервал (чтобы мышь "успокоилась")
+            // Сбрасываем флаг через небольшой интервал после последнего движения
             clearTimeout(window.mouseResetTimer);
             window.mouseResetTimer = setTimeout(() => {
                 mouseActive = false;
@@ -95,34 +132,17 @@
             }, 100);
         }
 
-        // При старте видео – показываем лого и планируем скрытие
-        video.addEventListener('play', () => {
-            showLogo();
-            scheduleHideIfPlaying();
-        });
+        // Подключаем API YouTube
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-        // При паузе или окончании – показываем лого и отменяем скрытие
-        video.addEventListener('pause', () => {
-            showLogo();
-            if (hideTimeout) {
-                clearTimeout(hideTimeout);
-                hideTimeout = null;
-            }
-        });
-
-        video.addEventListener('ended', () => {
-            showLogo();
-            if (hideTimeout) {
-                clearTimeout(hideTimeout);
-                hideTimeout = null;
-            }
-        });
-
-        // Отслеживаем движение мыши по всей странице
+        // Слушатели движения мыши
         document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('touchmove', onMouseMove); // для мобильных
+        document.addEventListener('touchmove', onMouseMove);
 
-        // При загрузке – лого видно
+        // Показываем лого при загрузке
         showLogo();
     </script>
 </body>
