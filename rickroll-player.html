@@ -55,21 +55,19 @@
     </a>
     <div class="video-container">
         <iframe id="youtubePlayer" 
-            src="https://www.youtube.com/embed/XGxIE1hr0w4?enablejsapi=1&autoplay=0"
+            src="https://www.youtube.com/embed/IwTSg99IBhM?enablejsapi=1&autoplay=1"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
             allowfullscreen>
         </iframe>
     </div>
 
     <script>
-        // Загружаем YouTube IFrame API
         let player;
         let hideTimeout = null;
         let mouseActive = false;
         let isPlaying = false;
         const homeLink = document.getElementById('homeLink');
 
-        // Функция, вызываемая API YouTube, когда готов
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('youtubePlayer', {
                 events: {
@@ -78,9 +76,7 @@
             });
         }
 
-        // Обработка изменения состояния плеера
         function onPlayerStateChange(event) {
-            // -1 (не стартовало), 0 (закончилось), 1 (играет), 2 (пауза), 3 (буферизация)
             if (event.data === YT.PlayerState.PLAYING) {
                 isPlaying = true;
                 showLogo();
@@ -95,7 +91,6 @@
             }
         }
 
-        // Показываем лого
         function showLogo() {
             if (hideTimeout) {
                 clearTimeout(hideTimeout);
@@ -104,12 +99,10 @@
             homeLink.classList.remove('hidden');
         }
 
-        // Прячем лого
         function hideLogo() {
             homeLink.classList.add('hidden');
         }
 
-        // Планируем скрытие через 3 секунды, если видео играет и мышь не активна
         function scheduleHideIfPlaying() {
             if (isPlaying && !mouseActive) {
                 if (hideTimeout) clearTimeout(hideTimeout);
@@ -117,14 +110,12 @@
             }
         }
 
-        // При любом движении мыши
         function onMouseMove() {
             mouseActive = true;
             showLogo();
             if (isPlaying) {
                 scheduleHideIfPlaying();
             }
-            // Сбрасываем флаг через небольшой интервал после последнего движения
             clearTimeout(window.mouseResetTimer);
             window.mouseResetTimer = setTimeout(() => {
                 mouseActive = false;
@@ -132,17 +123,14 @@
             }, 100);
         }
 
-        // Подключаем API YouTube
         const tag = document.createElement('script');
         tag.src = 'https://www.youtube.com/iframe_api';
         const firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-        // Слушатели движения мыши
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('touchmove', onMouseMove);
 
-        // Показываем лого при загрузке
         showLogo();
     </script>
 </body>
