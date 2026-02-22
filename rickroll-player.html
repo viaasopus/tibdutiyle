@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>забей...</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .home-link {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            cursor: pointer;
+            background: rgba(0,0,0,0.5);
+            padding: 5px;
+            line-height: 0;
+            border-radius: 0;
+            transition: opacity 0.3s ease;
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .home-link.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .home-link img {
+            display: block;
+            width: 160px;
+            height: auto;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: black;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="home-link" id="homeLink">
+        <img src="home.png" alt="На главную">
+    </a>
+    <video id="videoPlayer" src="vigilanteshootdown.mp4" controls autoplay loop></video>
+
+    <script>
+        const video = document.getElementById('videoPlayer');
+        const homeLink = document.getElementById('homeLink');
+        let hideTimeout = null;
+
+        function showLogo() {
+            if (hideTimeout) {
+                clearTimeout(hideTimeout);
+                hideTimeout = null;
+            }
+            homeLink.classList.remove('hidden');
+        }
+
+        function hideLogo() {
+            homeLink.classList.add('hidden');
+        }
+
+        function scheduleHide() {
+            if (hideTimeout) {
+                clearTimeout(hideTimeout);
+            }
+            hideTimeout = setTimeout(hideLogo, 3000);
+        }
+
+        // При начале воспроизведения планируем скрытие
+        video.addEventListener('play', () => {
+            showLogo(); // показываем, потом планируем скрытие
+            scheduleHide();
+        });
+
+        // При паузе или окончании сразу показываем лого и отменяем скрытие
+        video.addEventListener('pause', () => {
+            if (hideTimeout) {
+                clearTimeout(hideTimeout);
+                hideTimeout = null;
+            }
+            showLogo();
+        });
+
+        video.addEventListener('ended', () => {
+            if (hideTimeout) {
+                clearTimeout(hideTimeout);
+                hideTimeout = null;
+            }
+            showLogo();
+        });
+
+        // При движении мыши показываем лого и, если видео играет, планируем скрытие
+        document.addEventListener('mousemove', () => {
+            if (!video.paused) {
+                showLogo();
+                scheduleHide();
+            }
+        });
+
+        // Для мобильных устройств
+        document.addEventListener('touchmove', () => {
+            if (!video.paused) {
+                showLogo();
+                scheduleHide();
+            }
+        });
+
+        // При загрузке показываем лого
+        showLogo();
+    </script>
+</body>
+</html>

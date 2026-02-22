@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>нейрослоп|</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0 1rem;
+        }
+        .home-link {
+            display: block;
+            width: fit-content;
+            margin: 1rem auto 0;
+            cursor: pointer;
+        }
+        .home-link img {
+            display: block;
+            width: 160px;
+            height: auto;
+        }
+        .card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .card-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        .tool-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .tool-list li {
+            margin: 0.5rem 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .tool-list a {
+            display: block;
+            padding: 1rem;
+            text-decoration: none;
+            color: #28a745;
+            font-weight: 500;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-3px); }
+            100% { transform: translateX(0); }
+        }
+
+        .tool-list a:hover {
+            background: #ff4444;
+            color: white;
+            animation: shake 0.3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="home-link">
+        <img src="home.png" alt="На главную">
+    </a>
+    <div class="card">
+        <div class="card-content">
+            <ul class="tool-list">
+                <li><a href="calculator.html">слопулятор (калькулятор)</a></li>
+                <li><a href="paint.html">слопэйнт (псевдопэйнт)</a></li>
+                <li><a href="rickroll-player.html">VIGILANTE SHOOTDOWN</a></li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

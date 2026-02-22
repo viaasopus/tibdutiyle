@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>слопулятор|</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f0f0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0 1rem;
+        }
+        .home-link {
+            display: block;
+            width: fit-content;
+            margin: 1rem auto 0;
+            cursor: pointer;
+        }
+        .home-link img {
+            display: block;
+            width: 160px;
+            height: auto;
+        }
+        .calculator {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .calculator-box {
+            background: #e6e6e6;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            padding: 1.5rem;
+            width: 280px;
+            border: 1px solid #b0b0b0;
+        }
+        .display {
+            background: #f9f9f9;
+            border: 1px solid #a0a0a0;
+            border-radius: 4px;
+            padding: 0.8rem 1rem;
+            text-align: right;
+            font-size: 2rem;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 1rem;
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+        button {
+            background: #f0f0f0;
+            border: 1px solid #8c8c8c;
+            border-radius: 4px;
+            padding: 1rem 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            transition: background 0.1s, border-color 0.1s;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        button:hover {
+            background: #e0e0e0;
+            border-color: #6e6e6e;
+        }
+        button:active {
+            background: #d0d0d0;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .operator {
+            background: #f8f8f8;
+            font-weight: 600;
+        }
+        .equals {
+            background: #4caf50;
+            color: white;
+            border-color: #3d8b40;
+        }
+        .equals:hover {
+            background: #45a049;
+        }
+        .clear {
+            background: #f44336;
+            color: white;
+            border-color: #d32f2f;
+        }
+        .clear:hover {
+            background: #da190b;
+        }
+        .zero {
+            grid-column: span 2;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="home-link">
+        <img src="home.png" alt="На главную">
+    </a>
+    <div class="calculator">
+        <div class="calculator-box">
+            <div class="display" id="display">0</div>
+            <div class="buttons">
+                <button class="clear" id="clear">C</button>
+                <button class="operator" id="plusMinus">±</button>
+                <button class="operator" id="percent">%</button>
+                <button class="operator" id="divide">/</button>
+
+                <button id="7">7</button>
+                <button id="8">8</button>
+                <button id="9">9</button>
+                <button class="operator" id="multiply">*</button>
+
+                <button id="4">4</button>
+                <button id="5">5</button>
+                <button id="6">6</button>
+                <button class="operator" id="subtract">-</button>
+
+                <button id="1">1</button>
+                <button id="2">2</button>
+                <button id="3">3</button>
+                <button class="operator" id="add">+</button>
+
+                <button id="0" class="zero">0</button>
+                <button id="dot">.</button>
+                <button class="equals" id="equals">=</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Получаем элементы
+        const display = document.getElementById('display');
+        const clearBtn = document.getElementById('clear');
+        const plusMinusBtn = document.getElementById('plusMinus');
+        const percentBtn = document.getElementById('percent');
+        const divideBtn = document.getElementById('divide');
+        const multiplyBtn = document.getElementById('multiply');
+        const subtractBtn = document.getElementById('subtract');
+        const addBtn = document.getElementById('add');
+        const equalsBtn = document.getElementById('equals');
+        const dotBtn = document.getElementById('dot');
+        
+        // Цифры
+        const digitButtons = [];
+        for (let i = 0; i <= 9; i++) {
+            const btn = document.getElementById(i.toString());
+            if (btn) digitButtons.push(btn);
+        }
+
+        // Переменные состояния калькулятора
+        let currentInput = '0';
+        let previousInput = '';
+        let operation = null;
+        let resetDisplay = false;
+
+        function updateDisplay() {
+            display.textContent = currentInput;
+        }
+
+        function inputDigit(digit) {
+            if (resetDisplay) {
+                currentInput = digit;
+                resetDisplay = false;
+            } else {
+                if (currentInput === '0' && digit !== '0') {
+                    currentInput = digit;
+                } else if (currentInput === '0' && digit === '0') {
+                    // ничего
+                } else {
+                    currentInput += digit;
+                }
+            }
+            updateDisplay();
+        }
+
+        function inputDot() {
+            if (resetDisplay) {
+                currentInput = '0.';
+                resetDisplay = false;
+            } else {
+                if (!currentInput.includes('.')) {
+                    currentInput += '.';
+                }
+            }
+            updateDisplay();
+        }
+
+        function clearAll() {
+            currentInput = '0';
+            previousInput = '';
+            operation = null;
+            resetDisplay = false;
+            updateDisplay();
+        }
+
+        function toggleSign() {
+            if (currentInput !== '0') {
+                if (currentInput.startsWith('-')) {
+                    currentInput = currentInput.slice(1);
+                } else {
+                    currentInput = '-' + currentInput;
+                }
+                updateDisplay();
+            }
+        }
+
+        function percent() {
+            if (operation !== null && previousInput !== '') {
+                const prev = parseFloat(previousInput);
+                const curr = parseFloat(currentInput);
+                const percentValue = (prev * curr) / 100;
+                currentInput = percentValue.toString();
+                resetDisplay = true;
+            } else {
+                const value = parseFloat(currentInput);
+                currentInput = (value / 100).toString();
+            }
+            updateDisplay();
+        }
+
+        function setOperation(op) {
+            if (operation !== null && !resetDisplay) {
+                calculate();
+            }
+            previousInput = currentInput;
+            operation = op;
+            resetDisplay = true;
+        }
+
+        function calculate() {
+            if (operation === null || previousInput === '') return;
+
+            const prev = parseFloat(previousInput);
+            const curr = parseFloat(currentInput);
+            let result;
+
+            switch (operation) {
+                case '+':
+                    result = prev + curr;
+                    break;
+                case '-':
+                    result = prev - curr;
+                    break;
+                case '*':
+                    result = prev * curr;
+                    break;
+                case '/':
+                    if (curr === 0) {
+                        result = 'Ошибка';
+                    } else {
+                        result = prev / curr;
+                    }
+                    break;
+                default:
+                    return;
+            }
+
+            currentInput = result.toString();
+            operation = null;
+            previousInput = '';
+            resetDisplay = true;
+            updateDisplay();
+        }
+
+        digitButtons.forEach(btn => {
+            btn.addEventListener('click', () => inputDigit(btn.textContent));
+        });
+
+        dotBtn.addEventListener('click', inputDot);
+        clearBtn.addEventListener('click', clearAll);
+        plusMinusBtn.addEventListener('click', toggleSign);
+        percentBtn.addEventListener('click', percent);
+
+        addBtn.addEventListener('click', () => setOperation('+'));
+        subtractBtn.addEventListener('click', () => setOperation('-'));
+        multiplyBtn.addEventListener('click', () => setOperation('*'));
+        divideBtn.addEventListener('click', () => setOperation('/'));
+
+        equalsBtn.addEventListener('click', () => {
+            if (operation !== null) {
+                calculate();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            const key = e.key;
+            if (key >= '0' && key <= '9') {
+                inputDigit(key);
+            } else if (key === '.') {
+                inputDot();
+            } else if (key === '+' || key === '-') {
+                setOperation(key);
+            } else if (key === '*') {
+                setOperation('*');
+            } else if (key === '/') {
+                setOperation('/');
+            } else if (key === 'Enter' || key === '=') {
+                e.preventDefault();
+                if (operation !== null) calculate();
+            } else if (key === 'Escape' || key === 'c' || key === 'C') {
+                clearAll();
+            } else if (key === '%') {
+                percent();
+            }
+        });
+    </script>
+</body>
+</html>
